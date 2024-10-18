@@ -90,6 +90,16 @@ public class RNNaverMapMarkerManager extends EventEmittableViewGroupManager<RNNa
         view.setFlat(flat);
     }
 
+    @ReactProp(name = "isForceShowIcon", defaultBoolean = false)
+    public void setForceShowIcon(RNNaverMapMarker view, boolean isForceShowIcon) {
+        view.setForceShowIcon(isForceShowIcon);
+    }
+
+    @ReactProp(name = "isHideCollidedMarkers", defaultBoolean = false)
+    public void setHideCollidedMarkers(RNNaverMapMarker view, boolean isHideCollidedMarkers) {
+        view.setHideCollidedMarkers(isHideCollidedMarkers);
+    }
+
     @ReactProp(name = "width", defaultFloat = 64)
     public void setWidth(RNNaverMapMarker view, float width) {
         int widthInScreenPx = Math.round(metrics.density * width);

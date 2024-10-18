@@ -23,9 +23,9 @@ public class RNNaverMapViewContainer extends FrameLayout implements RNNaverMapVi
     private Bundle instanceStateBundle = new Bundle();
     private boolean isAttachedToWindow = false;
 
-    public RNNaverMapViewContainer(@NonNull ThemedReactContext themedReactContext, ReactApplicationContext appContext, FusedLocationSource locationSource, NaverMapOptions naverMapOptions) {
+    public RNNaverMapViewContainer(@NonNull ThemedReactContext themedReactContext, ReactApplicationContext appContext, NaverMapOptions naverMapOptions) {
         super(ReactUtil.getNonBuggyContext(themedReactContext, appContext));
-        this.mapView = new RNNaverMapView(themedReactContext, appContext, locationSource, naverMapOptions, instanceStateBundle);
+        this.mapView = new RNNaverMapView(themedReactContext, appContext, naverMapOptions, instanceStateBundle);
         addView(mapView);
     }
 
@@ -53,7 +53,7 @@ public class RNNaverMapViewContainer extends FrameLayout implements RNNaverMapVi
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (mapView != null && mapView.getMap().getUiSettings().isScrollGesturesEnabled()) {
+        if (mapView != null && mapView.getMap() != null && mapView.getMap().getUiSettings().isScrollGesturesEnabled()) {
             switch (ev.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                 case MotionEvent.ACTION_UP:
@@ -112,6 +112,12 @@ public class RNNaverMapViewContainer extends FrameLayout implements RNNaverMapVi
     public void zoomTo(LatLngBounds latLngBounds, int paddingInPx) {
         if (mapView != null)
             mapView.zoomTo(latLngBounds, paddingInPx);
+    }
+
+    @Override
+    public void setExtent(LatLngBounds latLngBounds) {
+        if (mapView != null)
+            mapView.setExtent(latLngBounds);
     }
 
     @Override

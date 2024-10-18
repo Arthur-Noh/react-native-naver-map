@@ -92,9 +92,9 @@ export default class NaverMapView extends Component {
         this.dispatchViewManagerCommand = (command, arg) => {
             return Platform.select({
                 // @ts-ignore
-                android: () => UIManager.dispatchViewManagerCommand(this.nodeHandle, 
-                // @ts-ignore
-                UIManager.getViewManagerConfig('RNNaverMapView').Commands[command], arg),
+                android: () => UIManager.dispatchViewManagerCommand(this.nodeHandle,
+                    // @ts-ignore
+                    UIManager.getViewManagerConfig('RNNaverMapView').Commands[command], arg),
                 ios: () => NativeModules[`RNNaverMapView`][command](this.nodeHandle, ...arg),
             })();
         };

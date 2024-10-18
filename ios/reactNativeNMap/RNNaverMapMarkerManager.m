@@ -8,7 +8,7 @@
 #import "RNNaverMapMarkerManager.h"
 #import "RNNaverMapMarker.h"
 #import <React/RCTUIManager.h>
-#import <NMapsMap/NMGLatLng.h>
+#import <NMapsGeometry/NMGLatLng.h>
 #import <NMapsMap/NMFCameraCommon.h>
 
 #import "RCTConvert+NMFMapView.h"
@@ -89,6 +89,6 @@ RCT_EXPORT_VIEW_PROPERTY(image, NSString)
 RCT_EXPORT_VIEW_PROPERTY(pinColor, UIColor)
 RCT_EXPORT_VIEW_PROPERTY(alpha, CGFloat)
 RCT_EXPORT_VIEW_PROPERTY(anchor, CGPoint)
-RCT_EXPORT_VIEW_PROPERTY(onClick, RCTDirectEventBlock)
+// RCT_EXPORT_VIEW_PROPERTY(onClick, RCTDirectEventBlock)
 
 @end

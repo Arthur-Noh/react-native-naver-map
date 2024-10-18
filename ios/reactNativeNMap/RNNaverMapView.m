@@ -11,7 +11,7 @@
 #import <React/RCTBridge.h>
 #import <React/UIView+React.h>
 
-#import <NMapsMap/NMGLatLng.h>
+#import <NMapsGeometry/NMGLatLng.h>
 #import <NMapsMap/NMFMarker.h>
 #import <NMapsMap/NMFCameraUpdate.h>
 #import <NMapsMap/NMFCameraPosition.h>
@@ -44,7 +44,12 @@
   // This is where we intercept them and do the appropriate underlying mapview action.
   if ([subview isKindOfClass:[RNNaverMapMarker class]]) {
     RNNaverMapMarker *marker = (RNNaverMapMarker*)subview;
-    marker.realMarker.mapView = self.mapView;
+      NSLog(@"insertReactSubview %@", marker.realMarker);
+      if(marker.realMarker.iconImage!=nil){
+          marker.realMarker.mapView = self.mapView;
+      }else{
+          marker.realMarker.mapView = nil;
+      }
   } else if ([subview isKindOfClass:[RNNaverMapPolylineOverlay class]]) {
     RNNaverMapPolylineOverlay *overlay = (RNNaverMapPolylineOverlay*)subview;
     overlay.realOverlay.mapView = self.mapView;
@@ -98,6 +103,7 @@
 }
 
 - (void)mapViewIdle:(nonnull NMFMapView *)mapView {
+    NSLog(@"\n\n\n  카메라 mapViewIdle  \n\n\n ::");
   if (((RNNaverMapView*)self).onCameraChange != nil)
     ((RNNaverMapView*)self).onCameraChange(@{
       @"latitude"      : @(mapView.cameraPosition.target.lat),
@@ -106,6 +112,16 @@
       @"contentRegion" : pointsToJson(mapView.contentRegion.exteriorRing.points),
       @"coveringRegion": pointsToJson(mapView.coveringRegion.exteriorRing.points),
     });
+}
+
+- (void)mapViewCameraIdle:(NMFMapView *)mapView {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"카메라 움직임 종료" message:nil preferredStyle:UIAlertControllerStyleAlert];
+    NSLog(@"\n\n\n  카메라 mapViewCameraIdle  \n\n\n ::");
+//    [self presentViewController:alert animated:true completion:^{
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+//            [alert dismissViewControllerAnimated:YES completion:nil];
+//        });
+//    }];
 }
 
 static NSArray* pointsToJson(NSArray<NMGLatLng*> *points) {

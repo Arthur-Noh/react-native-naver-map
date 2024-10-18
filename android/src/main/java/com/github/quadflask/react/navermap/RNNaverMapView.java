@@ -2,6 +2,7 @@ package com.github.quadflask.react.navermap;
 
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -26,18 +27,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RNNaverMapView extends MapView implements OnMapReadyCallback, NaverMap.OnCameraIdleListener, NaverMap.OnMapClickListener, RNNaverMapViewProps {
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
     private ThemedReactContext themedReactContext;
     private FusedLocationSource locationSource;
     private NaverMap naverMap;
+    private NaverMapSdk naverMapSdk;
     private ViewAttacherGroup attacherGroup;
     private long lastTouch = 0;
     private final List<RNNaverMapFeature<?>> features = new ArrayList<>();
 
-    public RNNaverMapView(@NonNull ThemedReactContext themedReactContext, ReactApplicationContext appContext, FusedLocationSource locationSource, NaverMapOptions naverMapOptions, Bundle instanceStateBundle) {
+    public RNNaverMapView(@NonNull ThemedReactContext themedReactContext, ReactApplicationContext appContext, NaverMapOptions naverMapOptions, Bundle instanceStateBundle) {
         super(ReactUtil.getNonBuggyContext(themedReactContext, appContext), naverMapOptions);
         this.themedReactContext = themedReactContext;
-        this.locationSource = locationSource;
+        this.locationSource = new FusedLocationSource(appContext.getCurrentActivity(), LOCATION_PERMISSION_REQUEST_CODE);
         super.onCreate(instanceStateBundle);
+        this.naverMapSdk = NaverMapSdk.getInstance(appContext);
+
 //        super.onStart();
         getMapAsync(this);
 
@@ -68,6 +73,7 @@ public class RNNaverMapView extends MapView implements OnMapReadyCallback, Naver
                 lastTouch = System.currentTimeMillis();
             }
         });
+        naverMapSdk.flushCache(() -> Log.i("NaverMap", "Map Cache Clean"));
         onInitialized();
     }
 
@@ -98,6 +104,13 @@ public class RNNaverMapView extends MapView implements OnMapReadyCallback, Naver
             CameraUpdate cameraUpdate = CameraUpdate.fitBounds(latLngBounds, paddingInPx)
                     .animate(CameraAnimation.Easing);
             naverMap.moveCamera(cameraUpdate);
+        });
+    }
+
+    @Override
+    public void setExtent(LatLngBounds latLngBounds) {
+        getMapAsync(e -> {
+            naverMap.setExtent(latLngBounds);
         });
     }
 
@@ -279,13 +292,15 @@ public class RNNaverMapView extends MapView implements OnMapReadyCallback, Naver
         CameraPosition cameraPosition = naverMap.getCameraPosition();
 
         WritableMap param = Arguments.createMap();
-        param.putDouble("latitude", cameraPosition.target.latitude);
-        param.putDouble("longitude", cameraPosition.target.longitude);
-        param.putDouble("zoom", cameraPosition.zoom);
-        param.putArray("contentRegion", ReactUtil.toWritableArray(naverMap.getContentRegion()));
-        param.putArray("coveringRegion", ReactUtil.toWritableArray(naverMap.getCoveringRegion()));
+        if (cameraPosition != null && naverMap != null) {
+            param.putDouble("latitude", cameraPosition.target.latitude);
+            param.putDouble("longitude", cameraPosition.target.longitude);
+            param.putDouble("zoom", cameraPosition.zoom);
+            param.putArray("contentRegion", ReactUtil.toWritableArray(naverMap.getContentRegion()));
+            param.putArray("coveringRegion", ReactUtil.toWritableArray(naverMap.getCoveringRegion()));
 
-        emitEvent("onCameraChange", param);
+            emitEvent("onCameraChange", param);
+        }
     }
 
     @Override
@@ -301,6 +316,7 @@ public class RNNaverMapView extends MapView implements OnMapReadyCallback, Naver
 
     @Override
     public void onDestroy() {
+        Log.i("onDestroy", "onDestroy");
         removeAllViews();
         themedReactContext = null;
         locationSource = null;
@@ -309,6 +325,7 @@ public class RNNaverMapView extends MapView implements OnMapReadyCallback, Naver
         for (RNNaverMapFeature<?> feature : features)
             feature.removeFromMap();
         features.clear();
+        naverMapSdk.flushCache(() -> Log.i("onDestroy NaverMap", "Map Cache Clean"));
         super.onDestroy();
     }
 

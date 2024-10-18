@@ -12,7 +12,7 @@
 #import <NMapsMap/NMFNaverMapView.h>
 #import <NMapsMap/NMFCameraUpdate.h>
 #import <NMapsMap/NMFCameraPosition.h>
-#import <NMapsMap/NMGLatLng.h>
+#import <NMapsGeometry/NMGLatLng.h>
 
 #import "RCTConvert+NMFMapView.h"
 #import "RNNaverMapView.h"
@@ -35,7 +35,9 @@ RCT_EXPORT_MODULE(RNNaverMapView)
 RCT_CUSTOM_VIEW_PROPERTY(center, NMFCameraUpdate*, RNNaverMapView)
 {
   if (json == nil) return;
+  view.mapView.extent = NMGLatLngBoundsMake(31.1024, 123.3159, 40.9486, 131.6808);
   [view.mapView moveCamera: [RCTConvert NMFCameraUpdateWith: json]];
+
   // TODO use `NMFCameraUpdateWith` if latlng, zoom, tilt, bearing exist.
 }
 

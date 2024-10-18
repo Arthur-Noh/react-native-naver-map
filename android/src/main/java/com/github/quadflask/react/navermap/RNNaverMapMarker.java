@@ -136,6 +136,14 @@ public class RNNaverMapMarker extends ClickableRNNaverMapFeature<Marker> impleme
         feature.setFlat(flat);
     }
 
+    public void setForceShowIcon(boolean isForceShowIcon){
+        feature.setForceShowIcon(isForceShowIcon);
+    }
+
+    public void setHideCollidedMarkers(boolean isHideCollidedMarkers){
+        feature.setHideCollidedMarkers(isHideCollidedMarkers);
+    }
+
     public void setRotation(float rotation) {
         feature.setAngle(rotation);
     }
@@ -167,6 +175,7 @@ public class RNNaverMapMarker extends ClickableRNNaverMapFeature<Marker> impleme
             if (overlayImage != null) {
                 setOverlayImage(overlayImage);
             } else {
+                feature.setAlpha(0);
                 if (uri.startsWith("http://") || uri.startsWith("https://") || uri.startsWith("file://") || uri.startsWith("asset://")) {
                     ImageRequest imageRequest = ImageRequestBuilder
                             .newBuilderWithSource(Uri.parse(uri))
@@ -205,8 +214,10 @@ public class RNNaverMapMarker extends ClickableRNNaverMapFeature<Marker> impleme
                                             CloseableReference.closeSafely(imageReference);
                                         }
                                     }
-                                    if (overlayImage != null)
+                                    if (overlayImage != null){
                                         setOverlayImage(overlayImage);
+                                        feature.setAlpha(1);
+                                    }
                                 }
                             })
                             .setOldController(imageHolder.getController())
@@ -216,6 +227,7 @@ public class RNNaverMapMarker extends ClickableRNNaverMapFeature<Marker> impleme
                     int rid = getRidFromName(uri);
                     final OverlayImage overlayImage1 = OverlayImage.fromResource(rid);
                     OverlayImages.put(uri, overlayImage1);
+                    feature.setAlpha(1);
                     setOverlayImage(overlayImage1);
                 }
             }
